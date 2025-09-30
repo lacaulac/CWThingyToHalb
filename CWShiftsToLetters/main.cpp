@@ -1,24 +1,19 @@
 #include <Windows.h>
 
-void simulateDit() {
+void listenAndSimulate(int vKey, WORD outputChar) {
 	while (true) {
-		if (GetAsyncKeyState(VK_LCONTROL) & 0x8000) {
-			//Send 'Z' key press
+		if (GetAsyncKeyState(vKey) & 0x8000) {
+			//Send outputChar key press
 			INPUT ip;
+			memset(&ip, 0, sizeof(INPUT));
 			ip.type = INPUT_KEYBOARD;
-			ip.ki.wScan = 0;
-			ip.ki.time = 0;
-			ip.ki.dwExtraInfo = 0;
 
-			ip.ki.wVk = 'Z';
-			ip.ki.dwFlags = 0; // 0 for key press
+			ip.ki.wVk = outputChar;
 			SendInput(1, &ip, sizeof(INPUT));
 
-			Sleep(10); // Short delay
-
 			ip.ki.dwFlags = KEYEVENTF_KEYUP; // KEYEVENTF_KEYUP for key release
-			//Wait until Left Shift key is released
-			while (GetAsyncKeyState(VK_LSHIFT) & 0x8000) {
+			//Wait until the key is released
+			while (GetAsyncKeyState(vKey) & 0x8000) {
 				Sleep(1);
 			}
 			SendInput(1, &ip, sizeof(INPUT));
@@ -26,30 +21,12 @@ void simulateDit() {
 	}
 }
 
+//Nah can't be bothered to create a struct that I'd pass through CreateThread
+void simulateDit() {
+	listenAndSimulate(VK_LCONTROL, 'Z');
+}
 void simulateDah() {
-	while (true) {
-		if (GetAsyncKeyState(VK_RCONTROL) & 0x8000) {
-			//Send 'X' key press
-			INPUT ip;
-			ip.type = INPUT_KEYBOARD;
-			ip.ki.wScan = 0;
-			ip.ki.time = 0;
-			ip.ki.dwExtraInfo = 0;
-
-			ip.ki.wVk = 'X';
-			ip.ki.dwFlags = 0; // 0 for key press
-			SendInput(1, &ip, sizeof(INPUT));
-
-			Sleep(10); // Short delay
-
-			ip.ki.dwFlags = KEYEVENTF_KEYUP; // KEYEVENTF_KEYUP for key release
-			//Wait until Left Shift key is released
-			while (GetAsyncKeyState(VK_LSHIFT) & 0x8000) {
-				Sleep(1);
-			}
-			SendInput(1, &ip, sizeof(INPUT));
-		}
-	}
+	listenAndSimulate(VK_RCONTROL, 'X');
 }
 
 int main(int argc, char** argv) {
